@@ -3,6 +3,25 @@ node_modules/
 !.env.example
 jsconfig.json
 
+# Database files
+*.db
+*.db-shm
+*.db-wal
+Vocabulary.db
+
+# PM2 logs
+back-end/logs/
+*.log
+
+# SSH keys (IMPORTANT: Never commit these!)
+*.pem
+*.key
+*.ppk
+
+# PM2 process files
+.pm2/
+pids/
+
 # REACT
 # Logs
 logs
