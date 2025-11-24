@@ -27,7 +27,7 @@ export const getAllTopicsForUser = async (req, res) => {
       const newProgress = await UserTopicProgress.create({
         mongoUserId: mongoUserId,
         topic_id: firstTopicId,
-        status: ['unlocked', 'comppleted']
+        status: 'unlocked'
       });
       // Thêm vào mảng progress
       userProgress.push(newProgress);
@@ -70,7 +70,7 @@ export const getFlashcardsForTopic = async (req, res) => {
       where: {
         mongoUserId: mongoUserId,
         topic_id: topicId,
-        status: ['unlocked'] // Phải là unlocked 
+        status: ['unlocked', 'completed'] // Phải là unlocked 
       }
     });
 

@@ -23,7 +23,7 @@ export const getQuizByTopicId = async (req, res) => {
       where: {
         mongoUserId: mongoUserId,
         topic_id: topicId,
-        status: ['unlocked', 'comppleted']
+        status: ['unlocked', 'completed']
       }
     });
 
