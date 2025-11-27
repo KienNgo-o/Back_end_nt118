@@ -5,10 +5,10 @@ import authRoute from "./routes/authRoute.js";
 import userRoute from "./routes/userRoute.js";
 import topicRoute from "./routes/topicRoute.js";
 import { protectedRoute } from "./middlewares/authMiddleware.js";
-import { connectSQLite } from "./libs/sqlite.js";
+import { connectsupabase } from "./libs/sqlite.js";
 import wordRoute from "./routes/wordRoute.js";
 import quizRoute from "./routes/quizRoute.js";
-
+import sequelize from "./libs/sqlite.js";
 dotenv.config();
 
 const app = express();
@@ -28,9 +28,12 @@ app.use("/api/topics", topicRoute);
 app.use("/api/words", wordRoute);
 app.use("/api/topics", quizRoute);
 connectDB().then(() => {
-  connectSQLite().then(() => {
-    app.listen(PORT, "0.0.0.0", () => { // "0.0.0.0" là đúng để máy ảo có thể truy cập
+  // Thêm từ khóa 'async' vào đầu hàm này 👇
+  connectsupabase().then(async () => { 
+
+    app.listen(PORT, "0.0.0.0", () => {
       console.log(`server bắt đầu trên cổng ${PORT}`);
     });
+
   });
 });

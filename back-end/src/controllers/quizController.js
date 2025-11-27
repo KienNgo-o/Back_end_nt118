@@ -105,66 +105,58 @@ export const submitQuiz = async (req, res) => {
     }
 
     // 2. CHẤM ĐIỂM (WEIGHTED SCORING)
-    let totalPossiblePoints = 0; // Tổng điểm tối đa có thể đạt được
-    let userEarnedPoints = 0;    // Tổng điểm user thực tế đạt được
-    
-    // Tạo Map câu trả lời của user để tra cứu nhanh (Key: question_id)
-    const userAnswersMap = new Map(answers.map(a => [a.question_id, a]));
+    let totalPossiblePoints = 0; 
+    let userEarnedPoints = 0;
+    // 🔥 FIX 1: Map key nên chuyển hết về String để tránh lệch kiểu (Int vs String)
 
-    // Duyệt qua TẤT CẢ câu hỏi trong ĐỀ THI (DB)
+    const userAnswersMap = new Map(answers.map(a => [String(a.question_id), a]));
+
     for (const dbQuestion of quiz.Questions) {
         
-        const userAnswer = userAnswersMap.get(dbQuestion.question_id);
+        // 🔥 FIX 2: Lấy câu trả lời bằng key String
+        const userAnswer = userAnswersMap.get(String(dbQuestion.question_id));
         
-        // --- TRƯỜNG HỢP 1: CÂU HỎI NỐI (Dạng 4) ---
-        // Trọng số điểm = số lượng cặp nối (thường là 4)
         if (dbQuestion.question_type === 'MATCH_PAIRS') {
-            // Điểm tối đa cho câu này = Số lượng cặp trong DB
             const maxPointsForQuestion = dbQuestion.MatchingPairs.length; 
             totalPossiblePoints += maxPointsForQuestion;
 
             if (userAnswer && userAnswer.pairs && Array.isArray(userAnswer.pairs)) {
                 let correctPairsCount = 0;
-                // Duyệt qua từng cặp user gửi lên để chấm điểm
                 for (const userPair of userAnswer.pairs) {
-                    // Tìm xem cặp này có đúng với DB không
                     const isPairCorrect = dbQuestion.MatchingPairs.some(
-                        dbPair => dbPair.image_url === userPair.image_url && dbPair.word_text === userPair.word_text
+                        dbPair => 
+                            // Nên trim() để tránh lỗi khoảng trắng thừa
+                            dbPair.image_url.trim() === userPair.image_url.trim() && 
+                            dbPair.word_text.trim() === userPair.word_text.trim()
                     );
-                    if (isPairCorrect) {
-                        correctPairsCount++;
-                    }
+                    if (isPairCorrect) correctPairsCount++;
                 }
-                // Cộng điểm thực tế (mỗi cặp đúng = 1 điểm)
                 userEarnedPoints += correctPairsCount;
             }
         } 
-        
-        // --- TRƯỜNG HỢP 2: CÁC CÂU HỎI KHÁC (Dạng 1, 2, 3) ---
-        // Trọng số điểm = 1
         else {
-            totalPossiblePoints += 1; // Mặc định 1 điểm
+            totalPossiblePoints += 1; 
             let isCorrect = false;
 
-            // Nếu user có trả lời
             if (userAnswer) {
                 switch (dbQuestion.question_type) {
-                    // Dạng 1 & 2: Chọn hình hoặc Chọn chữ (Trắc nghiệm)
                     case 'LISTEN_CHOOSE_IMG':
                     case 'IMG_CHOOSE_TEXT':
                         if (userAnswer.selected_option_id) {
-                            const correctOption = dbQuestion.QuestionOptions.find(opt => opt.is_correct === 1);
-                            // So sánh ID đáp án chọn với ID đáp án đúng
-                            if (correctOption && correctOption.option_id === userAnswer.selected_option_id) {
+                            // 🔥 FIX 3: Kiểm tra is_correct linh hoạt (cả true lẫn 1)
+                            const correctOption = dbQuestion.QuestionOptions.find(opt => 
+                                opt.is_correct === true || opt.is_correct === 1
+                            );
+                            
+                            // 🔥 FIX 4: So sánh ID bằng String (tránh 5 === "5" -> false)
+                            if (correctOption && String(correctOption.option_id) === String(userAnswer.selected_option_id)) {
                                 isCorrect = true;
                             }
                         }
                         break;
                     
-                    // Dạng 3: Điền từ
                     case 'FILL_BLANK':
                          if (userAnswer.text_input && dbQuestion.correct_text_answer) {
-                             // So sánh chuỗi (không phân biệt hoa thường, bỏ khoảng trắng thừa)
                              if (userAnswer.text_input.trim().toLowerCase() === dbQuestion.correct_text_answer.trim().toLowerCase()) {
                                  isCorrect = true;
                              }
@@ -173,9 +165,7 @@ export const submitQuiz = async (req, res) => {
                 }
             }
 
-            if (isCorrect) {
-                userEarnedPoints += 1;
-            }
+            if (isCorrect) userEarnedPoints += 1;
         }
     }
 

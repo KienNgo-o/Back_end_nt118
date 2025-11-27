@@ -29,7 +29,7 @@ const UserTopicProgress = sequelize.define("UserTopicProgress", {
   }
 }, {
   tableName: 'UserTopicProgress',
-  timestamps: false // Lần này nên dùng timestamps
+  timestamps: true // Lần này nên dùng timestamps
 });
 
 Topic.hasMany(UserTopicProgress, { foreignKey: 'topic_id' });

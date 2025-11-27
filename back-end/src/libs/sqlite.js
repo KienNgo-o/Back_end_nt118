@@ -1,27 +1,31 @@
-// libs/sqlite.js
 import { Sequelize } from "sequelize";
+import dotenv from "dotenv";
 
-// Khởi tạo kết nối Sequelize
-const sequelize = new Sequelize({
-  dialect: "sqlite", // 👈 Thay đổi quan trọng
-  storage: "Vocabulary.db", // 👈 Đường dẫn đến file database
-  logging: console.log, // Hiện log SQL khi chạy
+dotenv.config();
+
+// 1. Khởi tạo instance Sequelize (Vẫn cần cái này để export cho các Model dùng)
+const sequelize = new Sequelize(process.env.SUPABASE_CONNECTION_STRING, {
+  dialect: "postgres",
+  logging: false,
+  dialectOptions: {
+    ssl: {
+      require: true,
+      rejectUnauthorized: false,
+    },
+  },
 });
 
-// Hàm để kiểm tra kết nối
-export const connectSQLite = async () => {
+// 2. Tạo hàm connect giống phong cách Mongoose bạn muốn
+export const connectsupabase = async () => {
   try {
+    // authenticate() là hàm kiểm tra kết nối của Sequelize
     await sequelize.authenticate();
-    console.log("Kết nối SQLite thành công!");
-    
-    // Đồng bộ models
-    await sequelize.sync({ alter: false }); 
-    console.log("Đã đồng bộ models của SQLite.");
-    
+    console.log("Liên kết Supabase (PostgreSQL) thành công!");
   } catch (error) {
-    console.error("Lỗi khi kết nối SQLite:", error);
-    process.exit(1);
+    console.log("Lỗi khi kết nối Supabase:", error);
+    process.exit(1); // Dừng chương trình nếu lỗi
   }
 };
 
-export default sequelize; // Xuất ra instance để dùng trong models
+// 3. Export default instance để các Model sử dụng
+export default sequelize;
