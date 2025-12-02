@@ -9,6 +9,7 @@ import { connectsupabase } from "./libs/posgre.js";
 import wordRoute from "./routes/wordRoute.js";
 import quizRoute from "./routes/quizRoute.js";
 import adminRoute from "./routes/adminRoute.js"
+import pronunciationRoute from "./routes/pronunciationRoute.js"
 dotenv.config();
 
 const app = express();
@@ -27,6 +28,7 @@ app.use("/api/users", userRoute);
 app.use("/api/topics", topicRoute);
 app.use("/api/words", wordRoute);
 app.use("/api/topics", quizRoute);
+app.use("/api/pronun",pronunciationRoute);
 app.use(adminAuthen);
 app.use("/api/admin", adminRoute);
 connectDB().then(() => {
