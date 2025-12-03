@@ -70,7 +70,7 @@ export const getFlashcardsForTopic = async (req, res) => {
       where: {
         mongoUserId: mongoUserId,
         topic_id: topicId,
-        status: ['unlocked', 'completed'] // Phải là unlocked 
+        status: ['unlocked', 'completed'] // Phải là unlocked hoặc completed
       }
     });
 
