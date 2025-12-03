@@ -1,6 +1,10 @@
 // models/mysql/UserTopicProgress.js
 import { DataTypes } from "sequelize";
+<<<<<<< HEAD
 import sequelize from "../libs/posgre.js";
+=======
+import sequelize from "../libs/sqlite.js";
+>>>>>>> 73fa3a001cfbcdbb44df21759a1ae5fd55eaa2b7
 import Topic from "./Topics.js";
 
 const UserTopicProgress = sequelize.define("UserTopicProgress", {
@@ -29,7 +33,11 @@ const UserTopicProgress = sequelize.define("UserTopicProgress", {
   }
 }, {
   tableName: 'UserTopicProgress',
+<<<<<<< HEAD
   timestamps: true // Lần này nên dùng timestamps
+=======
+  timestamps: false // Lần này nên dùng timestamps
+>>>>>>> 73fa3a001cfbcdbb44df21759a1ae5fd55eaa2b7
 });
 
 Topic.hasMany(UserTopicProgress, { foreignKey: 'topic_id' });

@@ -1,0 +1,16 @@
+# Web Framework
+flask
+
+# AI Model (Speech-to-Text)
+openai-whisper
+
+# Audio Processing & DSP
+librosa
+numpy
+scipy
+
+# Algorithms (Dynamic Time Warping)
+fastdtw
+
+# Utilities
+requests
