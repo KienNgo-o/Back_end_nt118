@@ -34,12 +34,12 @@ export const getQuizByTopicId = async (req, res) => {
     // 2. LẤY DỮ LIỆU QUIZ (Kèm Câu hỏi & Đáp án)
     const quiz = await Quiz.findOne({
       where: { topic_id: topicId },
-      attributes: ['quiz_id', 'title', 'passing_score', 'duration_minutes'], // Lấy các trường cần thiết
+      attributes: ['quiz_id', 'title', 'passing_score', 'duration_minutes'], 
       include: [
         {
           model: Question,
           attributes: ['question_id', 'question_type', 'prompt', 'image_url', 'audio_url'], 
-          // Lưu ý: KHÔNG lấy 'correct_text_answer' (cho dạng điền từ) để bảo mật
+        
           
           include: [
             {
@@ -223,8 +223,6 @@ export const submitQuiz = async (req, res) => {
     return res.status(200).json({
       score: scorePercentage,       // Điểm quy đổi (0-100)
       passed: passed === 1,
-      user_points: userEarnedPoints,         // Điểm thô user đạt được (ví dụ: 8)
-      total_possible_points: totalPossiblePoints, // Tổng điểm thô tối đa (ví dụ: 10)
       is_next_topic_unlocked: isNextTopicUnlocked,
       submitted_at: resultRecord.createdAt
     });
