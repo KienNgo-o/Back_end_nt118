@@ -107,11 +107,11 @@ export const signIn = async (req, res) => {
 export const signOut = async (req, res) => {
   try {
     // Lấy refresh token từ JSON body thay vì cookie
-    const { refreshToken } = req.body; // <-- THAY ĐỔI
+    const { refreshToken } = req.body; 
 
     if (refreshToken) {
       // xoá refresh token trong Session
-      await Session.deleteOne({ refreshToken: refreshToken }); // <-- THAY ĐỔI
+      await Session.deleteOne({ refreshToken: refreshToken }); 
     }
 
     return res.sendStatus(204);

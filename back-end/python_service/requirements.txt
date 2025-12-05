@@ -1,0 +1,19 @@
+# Web Framework
+flask
+
+# AI Model (Speech-to-Text)
+openai-whisper
+
+# Audio Processing & DSP
+librosa
+numpy
+scipy
+
+# Algorithms (Dynamic Time Warping)
+fastdtw
+
+# Utilities
+requests
+# sudo apt update
+# sudo apt install python3-pip python3-venv -y
+# sudo apt update && sudo apt install ffmpeg

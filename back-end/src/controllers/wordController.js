@@ -4,11 +4,12 @@ import {
   Definition,
   POS,
   Example,
+  Topics,
   Pronunciation,
   Synonym_Groups, // 👈 Khớp với index.js
   Word_Families   // 👈 Khớp với index.js
 } from "../models/index.js"; // 👈 Sửa đường dẫn nếu cần
-
+import UserTopicProgress from "../models/UserTopicProgress.js";
 /**
  * API 3: Lấy chi tiết đầy đủ của 1 từ (Cả 3 tab)
  */
@@ -160,6 +161,59 @@ export const getWordDetails = async (req, res) => {
 
   } catch (error) {
     console.error("Lỗi khi lấy getWordDetails:", error);
+    return res.status(500).json({ message: "Lỗi hệ thống" });
+  }
+};
+export const getWordsByTopic = async (req, res) => {
+  try {
+    const { topicId } = req.params;
+    const userId = req.user._id.toString(); // Lấy ID user từ middleware
+
+    // 1. KIỂM TRA QUYỀN TRUY CẬP (Logic tiến độ)
+    // Mặc định Topic 1 luôn mở
+    if (parseInt(topicId) !== 1) {
+      const progress = await UserTopicProgress.findOne({
+        where: {
+          mongoUserId: userId,
+          topic_id: topicId
+        }
+      });
+
+      // Nếu chưa có tiến độ hoặc trạng thái là locked -> Chặn
+      if (!progress || progress.status === 'locked') {
+        return res.status(403).json({ 
+          message: "Bạn chưa mở khóa Topic này. Hãy hoàn thành các bài học trước." 
+        });
+      }
+    }
+
+    // 2. LẤY DANH SÁCH TỪ VỰNG
+    const words = await Word.findAll({
+      include: [
+        {
+          model: Topics,
+          where: { topic_id: topicId }, // Chỉ lấy từ thuộc topic này
+          attributes: [] // Không cần lấy thông tin topic, chỉ dùng để lọc
+        },
+        {
+          model: Pronunciation,
+          attributes: ['audio_file_url', 'phonetic_spelling'] // Lấy link audio mẫu và phiên âm
+        },
+        {
+          model: Definition,
+          attributes: ['definition_text'] // Lấy nghĩa (tùy chọn)
+        }
+      ]
+    });
+
+    return res.status(200).json({
+      topic_id: topicId,
+      total_words: words.length,
+      data: words
+    });
+
+  } catch (error) {
+    console.error("Lỗi getWordsByTopic:", error);
     return res.status(500).json({ message: "Lỗi hệ thống" });
   }
 };
